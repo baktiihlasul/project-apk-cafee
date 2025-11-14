@@ -103,10 +103,8 @@ const HomeScreen: React.FC = () => {
     </TouchableOpacity>
   );
 
-  
-
-  return (
-    <SafeAreaView style={styles.container}>
+  const renderHeader = () => (
+    <>
       <View style={styles.header} />
 
       <View style={styles.promoCard}>
@@ -165,11 +163,17 @@ const HomeScreen: React.FC = () => {
         />
       </View>
 
+      <Text style={styles.listHeader}>Menu</Text>
+    </>
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
       <FlatList
         data={filteredMenu}
         renderItem={renderCoffeeItem}
         keyExtractor={item => item.id}
-        ListHeaderComponent={<Text style={styles.listHeader}>Menu</Text>}
+        ListHeaderComponent={renderHeader}
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
