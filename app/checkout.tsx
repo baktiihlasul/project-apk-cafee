@@ -1,24 +1,26 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import CustomTextInput from '../src/components/CustomTextInput';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Alert, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import CustomButton from '../src/components/CustomButton';
+import CustomTextInput from '../src/components/CustomTextInput';
 import { COLORS } from '../src/constants/colors';
 import { useCart } from '../src/context/CartContext';
+import { fontSize, moderateScale, spacing } from '../src/utils/responsive';
 
 const CheckoutScreen: React.FC = () => {
   const router = useRouter();
   const { total } = useLocalSearchParams<{ total: string }>();
   const totalAmount = total ? parseFloat(total) : 0;
 
-  const { clearCart } = useCart();
+  const { clearCart, cartItems } = useCart();
 
   const [nama, setNama] = useState<string>('');
   const [alamat, setAlamat] = useState<string>('');
   const [noTelp, setNoTelp] = useState<string>('');
 
-  const handleBayar = () => {
+  const handleBayar = async () => {
     if (!nama || !alamat || !noTelp) {
       Alert.alert('Data Tidak Lengkap', 'Harap isi semua field.');
       return;
@@ -49,30 +51,38 @@ const CheckoutScreen: React.FC = () => {
         <Text style={styles.headerTitle}>Checkout</Text>
       </View>
 
-      <CustomTextInput
-        placeholder="Nama"
-        value={nama}
-        onChangeText={setNama}
-        style={styles.input}
-      />
-      <CustomTextInput
-        placeholder="Alamat"
-        value={alamat}
-        onChangeText={setAlamat}
-        style={styles.input}
-      />
-      <CustomTextInput
-        placeholder="No. Telp"
-        value={noTelp}
-        onChangeText={setNoTelp}
-        style={styles.input}
-        keyboardType="phone-pad"
-      />
+      <Animated.View 
+        style={styles.formContainer}
+        entering={FadeInDown.delay(100).springify()}
+      >
+        <CustomTextInput
+          placeholder="Nama"
+          value={nama}
+          onChangeText={setNama}
+          style={styles.input}
+        />
+        <CustomTextInput
+          placeholder="Alamat"
+          value={alamat}
+          onChangeText={setAlamat}
+          style={styles.input}
+        />
+        <CustomTextInput
+          placeholder="No. Telp"
+          value={noTelp}
+          onChangeText={setNoTelp}
+          style={styles.input}
+          keyboardType="phone-pad"
+        />
+      </Animated.View>
       
-      <View style={styles.totalContainer}>
+      <Animated.View 
+        style={styles.totalContainer}
+        entering={FadeInDown.delay(300).springify()}
+      >
         <Text style={styles.totalText}>Total Bayar:</Text>
         <Text style={styles.totalAmount}>Rp. {totalAmount.toLocaleString('id-ID')}</Text>
-      </View>
+      </Animated.View>
       
       <CustomButton
         title="Bayar Sekarang"
@@ -87,46 +97,53 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.backgroundDark,
-    alignItems: 'center',
-    paddingTop: 10,
+    paddingTop: spacing.sm,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.md,
     width: '100%',
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: fontSize.xl,
     fontWeight: 'bold',
     color: COLORS.white,
-    marginLeft: 10,
+    marginLeft: spacing.sm,
+  },
+  formContainer: {
+    width: '100%',
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
   },
   input: {
-    backgroundColor: COLORS.lightGray,
-    width: '90%',
-    color: COLORS.black,
+    backgroundColor: COLORS.secondary,
+    width: '100%',
+    color: COLORS.white,
+    marginBottom: spacing.md,
   },
   totalContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '90%',
-    marginTop: 20,
-    padding: 15,
+    marginTop: spacing.md,
+    marginHorizontal: '5%',
+    padding: spacing.md,
     backgroundColor: COLORS.secondary,
-    borderRadius: 10,
+    borderRadius: moderateScale(10),
   },
   totalText: {
     color: COLORS.white,
-    fontSize: 16,
+    fontSize: fontSize.base,
   },
   totalAmount: {
-    color: COLORS.white,
-    fontSize: 18,
+    color: COLORS.primary,
+    fontSize: fontSize.lg,
     fontWeight: 'bold',
   },
   button: {
-    marginTop: 30,
+    marginTop: spacing.lg,
+    marginHorizontal: spacing.md,
   }
 });
 

@@ -2,17 +2,23 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  FlatList,
-  Image,
-  RefreshControl,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    FlatList,
+    Image,
+    RefreshControl,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
+import Animated, {
+    FadeInDown,
+    FadeInRight,
+    Layout
+} from 'react-native-reanimated';
 import { COLORS } from '../../src/constants/colors';
+import { fontSize, moderateScale, spacing } from '../../src/utils/responsive';
 
 interface CoffeeItem {
   id: string;
@@ -78,29 +84,39 @@ const HomeScreen: React.FC = () => {
     return matchSearch && matchCategory;
   });
 
-  const renderBestsellerItem = ({ item }: { item: CoffeeItem }) => (
-    <TouchableOpacity
-      style={styles.bestsellerCard}
-      onPress={() => router.push({ pathname: '/product/[id]', params: { id: item.id } })}
+  const renderBestsellerItem = ({ item, index }: { item: CoffeeItem; index: number }) => (
+    <Animated.View
+      entering={FadeInRight.delay(index * 100).springify()}
+      layout={Layout.springify()}
     >
-      <Image source={{ uri: item.image }} style={styles.bestsellerImage} />
-      <Text style={styles.bestsellerName}>{item.name}</Text>
-      <Text style={styles.bestsellerPrice}>Rp {item.price.toLocaleString('id-ID')}</Text>
-    </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.bestsellerCard}
+        onPress={() => router.push({ pathname: '/product/[id]', params: { id: item.id } })}
+      >
+        <Image source={{ uri: item.image }} style={styles.bestsellerImage} />
+        <Text style={styles.bestsellerName}>{item.name}</Text>
+        <Text style={styles.bestsellerPrice}>Rp {item.price.toLocaleString('id-ID')}</Text>
+      </TouchableOpacity>
+    </Animated.View>
   );
 
-  const renderCoffeeItem = ({ item }: { item: CoffeeItem }) => (
-    <TouchableOpacity
-      style={styles.menuItem}
-      onPress={() => router.push({ pathname: '/product/[id]', params: { id: item.id } })}
+  const renderCoffeeItem = ({ item, index }: { item: CoffeeItem; index: number }) => (
+    <Animated.View
+      entering={FadeInDown.delay(index * 50).springify()}
+      layout={Layout.springify()}
     >
-      <Image source={{ uri: item.image }} style={styles.menuItemImage} />
-      <View style={styles.menuItemText}>
-        <Text style={styles.menuItemName}>{item.name}</Text>
-        <Text style={styles.menuItemDesc}>{item.description}</Text>
-        <Text style={styles.menuItemPrice}>Rp {item.price.toLocaleString('id-ID')}</Text>
-      </View>
-    </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.menuItem}
+        onPress={() => router.push({ pathname: '/product/[id]', params: { id: item.id } })}
+      >
+        <Image source={{ uri: item.image }} style={styles.menuItemImage} />
+        <View style={styles.menuItemText}>
+          <Text style={styles.menuItemName}>{item.name}</Text>
+          <Text style={styles.menuItemDesc}>{item.description}</Text>
+          <Text style={styles.menuItemPrice}>Rp {item.price.toLocaleString('id-ID')}</Text>
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
   );
 
   const renderHeader = () => (
@@ -197,32 +213,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.backgroundDark,
-    paddingTop: 10,
+    paddingTop: spacing.sm,
   },
   center: {
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 50,
+    paddingTop: spacing.xl,
   },
   loadingText: {
-    marginTop: 10,
+    marginTop: spacing.sm,
     color: COLORS.white,
+    fontSize: fontSize.base,
   },
   errorText: {
     color: 'red',
-    fontSize: 16,
+    fontSize: fontSize.base,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
   promoCard: {
     backgroundColor: COLORS.primary,
-    borderRadius: 20,
-    marginHorizontal: 20,
-    padding: 20,
+    borderRadius: moderateScale(20),
+    marginHorizontal: spacing.md,
+    padding: spacing.md,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -231,46 +248,46 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   promoTitle: {
-    fontSize: 22,
+    fontSize: fontSize.xl,
     fontWeight: 'bold',
     color: COLORS.white,
   },
   promoImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: moderateScale(80),
+    height: moderateScale(80),
+    borderRadius: moderateScale(40),
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.secondary,
-    borderRadius: 25,
-    marginHorizontal: 20,
-    marginVertical: 10,
-    paddingHorizontal: 15,
+    borderRadius: moderateScale(25),
+    marginHorizontal: spacing.md,
+    marginVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
   },
   searchIcon: {
-    marginRight: 10,
+    marginRight: spacing.sm,
   },
   searchInput: {
     flex: 1,
-    height: 50,
+    height: moderateScale(50),
     color: COLORS.white,
-    fontSize: 16,
+    fontSize: fontSize.base,
   },
   categoryContainer: {
-    paddingVertical: 8,
+    paddingVertical: spacing.sm,
   },
   categoryList: {
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.md,
   },
   categoryPill: {
     borderWidth: 1,
     borderColor: COLORS.lightGray,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 8,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: moderateScale(20),
+    marginRight: spacing.sm,
     backgroundColor: 'transparent',
   },
   categoryPillSelected: {
@@ -279,81 +296,81 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     color: COLORS.lightGray,
-    fontSize: 14,
+    fontSize: fontSize.md,
     fontWeight: '600',
   },
   categoryTextSelected: {
     color: COLORS.white,
   },
   listHeader: {
-    fontSize: 20,
+    fontSize: fontSize.xl,
     fontWeight: 'bold',
     color: COLORS.white,
-    paddingHorizontal: 20,
-    marginBottom: 10,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.sm,
   },
   menuItem: {
     backgroundColor: COLORS.primary,
-    borderRadius: 15,
-    padding: 15,
-    marginHorizontal: 20,
-    marginBottom: 15,
+    borderRadius: moderateScale(15),
+    padding: spacing.md,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.md,
     flexDirection: 'row', 
   },
   menuItemImage: {
-    width: 70,
-    height: 70,
-    borderRadius: 10,
-    marginRight: 15,
+    width: moderateScale(70),
+    height: moderateScale(70),
+    borderRadius: moderateScale(10),
+    marginRight: spacing.md,
   },
   menuItemText: {
     flex: 1, 
   },
   menuItemName: {
-    fontSize: 18,
+    fontSize: fontSize.lg,
     fontWeight: 'bold',
     color: COLORS.white,
   },
   menuItemDesc: {
-    fontSize: 14,
+    fontSize: fontSize.md,
     color: COLORS.lightGray,
-    marginTop: 5,
+    marginTop: spacing.xs,
   },
   menuItemPrice: {
-    fontSize: 16,
+    fontSize: fontSize.base,
     fontWeight: 'bold',
     color: COLORS.white,
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
   bestsellerContainer: {
-    marginBottom: 15,
+    marginBottom: spacing.md,
   },
   bestsellerList: {
-    paddingLeft: 20,
-    paddingRight: 10,
+    paddingLeft: spacing.md,
+    paddingRight: spacing.sm,
   },
   bestsellerCard: {
     backgroundColor: COLORS.secondary,
-    borderRadius: 15,
-    padding: 15,
-    width: 150,
-    marginRight: 15,
+    borderRadius: moderateScale(15),
+    padding: spacing.md,
+    width: moderateScale(150),
+    marginRight: spacing.md,
   },
   bestsellerImage: {
     width: '100%',
-    height: 100,
-    borderRadius: 10,
-    marginBottom: 10,
+    height: moderateScale(100),
+    borderRadius: moderateScale(10),
+    marginBottom: spacing.sm,
   },
   bestsellerName: {
-    fontSize: 16,
+    fontSize: fontSize.base,
     fontWeight: 'bold',
     color: COLORS.white,
   },
   bestsellerPrice: {
-    fontSize: 14,
+    fontSize: fontSize.md,
     color: COLORS.primary,
-    marginTop: 5,
+    marginTop: spacing.xs,
   },
 });
 

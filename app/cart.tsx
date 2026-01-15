@@ -1,17 +1,20 @@
-import React from 'react'; // Hapus 'useState' jika tidak dipakai lagi
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  ListRenderItem,
-} from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../src/constants/colors';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import {
+    FlatList,
+    Image,
+    ListRenderItem,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import Animated, { FadeInDown, Layout } from 'react-native-reanimated';
 import CustomButton from '../src/components/CustomButton';
+import { COLORS } from '../src/constants/colors';
 import { useCart } from '../src/context/CartContext';
+import { fontSize, moderateScale, spacing } from '../src/utils/responsive';
 
 
 const CartScreen: React.FC = () => {
@@ -24,19 +27,27 @@ const CartScreen: React.FC = () => {
     return cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   };
 
-  const renderItem: ListRenderItem<typeof cartItems[0]> = ({ item }) => (
-    <View style={styles.itemContainer}>
-      <Text style={styles.itemName}>{item.name}</Text>
+  const renderItem: ListRenderItem<typeof cartItems[0]> = ({ item, index }) => (
+    <Animated.View 
+      entering={FadeInDown.delay(index * 100).springify()}
+      layout={Layout.springify()}
+      style={styles.itemContainer}
+    >
+      <Image source={{ uri: item.image }} style={styles.itemImage} />
+      <View style={styles.itemDetails}>
+        <Text style={styles.itemName}>{item.name}</Text>
+        <Text style={styles.itemPrice}>Rp {item.price.toLocaleString('id-ID')}</Text>
+      </View>
       <View style={styles.quantityControl}>
         <TouchableOpacity onPress={() => updateQuantity(item.id, -1)}>
-          <Ionicons name="remove-circle" size={24} color={COLORS.primary} />
+          <Ionicons name="remove-circle" size={moderateScale(28)} color={COLORS.primary} />
         </TouchableOpacity>
         <Text style={styles.itemQuantity}>{item.quantity}</Text>
         <TouchableOpacity onPress={() => updateQuantity(item.id, 1)}>
-          <Ionicons name="add-circle" size={24} color={COLORS.primary} />
+          <Ionicons name="add-circle" size={moderateScale(28)} color={COLORS.primary} />
         </TouchableOpacity>
       </View>
-    </View>
+    </Animated.View>
   );
 
   const handleCheckout = () => {
@@ -78,21 +89,85 @@ const CartScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background, paddingTop: 50 },
-  header: { flexDirection: 'row', alignItems: 'center', padding: 20 },
-  headerTitle: { fontSize: 20, fontWeight: 'bold', marginLeft: 10 },
-  itemContainer: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#eee' },
-  itemName: { fontSize: 16 },
-  quantityControl: { flexDirection: 'row', alignItems: 'center' },
-  itemQuantity: { marginHorizontal: 10, fontSize: 16 },
-  footer: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, borderTopWidth: 1, borderTopColor: '#eee' },
-  totalText: { fontSize: 18 },
-  totalAmount: { fontSize: 18, fontWeight: 'bold' },
+  container: { 
+    flex: 1, 
+    backgroundColor: COLORS.backgroundDark, 
+    paddingTop: spacing.xl 
+  },
+  header: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    padding: spacing.md 
+  },
+  headerTitle: { 
+    fontSize: fontSize.xl, 
+    fontWeight: 'bold', 
+    marginLeft: spacing.sm,
+    color: COLORS.white
+  },
+  itemContainer: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    padding: spacing.md, 
+    alignItems: 'center', 
+    borderBottomWidth: 1, 
+    borderBottomColor: COLORS.secondary,
+    backgroundColor: COLORS.primary,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    borderRadius: moderateScale(12)
+  },
+  itemImage: {
+    width: moderateScale(60),
+    height: moderateScale(60),
+    borderRadius: moderateScale(10),
+  },
+  itemDetails: {
+    flex: 1,
+    marginLeft: spacing.md,
+  },
+  itemName: { 
+    fontSize: fontSize.base, 
+    fontWeight: 'bold',
+    color: COLORS.white 
+  },
+  itemPrice: {
+    fontSize: fontSize.sm,
+    color: COLORS.lightGray,
+    marginTop: spacing.xs
+  },
+  quantityControl: { 
+    flexDirection: 'row', 
+    alignItems: 'center' 
+  },
+  itemQuantity: { 
+    marginHorizontal: spacing.md, 
+    fontSize: fontSize.lg,
+    fontWeight: 'bold',
+    color: COLORS.white 
+  },
+  footer: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    padding: spacing.md, 
+    borderTopWidth: 1, 
+    borderTopColor: COLORS.secondary,
+    marginTop: spacing.sm
+  },
+  totalText: { 
+    fontSize: fontSize.lg,
+    color: COLORS.white 
+  },
+  totalAmount: { 
+    fontSize: fontSize.xl, 
+    fontWeight: 'bold',
+    color: COLORS.primary 
+  },
   emptyText: {
     textAlign: 'center',
-    marginTop: 50,
-    fontSize: 16,
-    color: 'gray',
+    marginTop: spacing.xl,
+    fontSize: fontSize.base,
+    color: COLORS.lightGray,
   }
 });
 
